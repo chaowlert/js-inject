@@ -69,11 +69,7 @@ describe('Injector', function () {
         let locals = { num: 5 };
 
         //act
-        let result = injector.invoke(
-            // @ngInject
-            function (classE: ClassE, num: number) {
-                return classE.id + num;
-            }, null, locals);
+        let result = injector.invoke(/* @ngInject */ (classE: ClassE, num: number) => classE.id + num, null, locals);
 
         //assert
         expect(result).equals(15);
@@ -128,7 +124,7 @@ class ClassB {
     classC: ClassC;
 }
 
-// @ngInject
+/* @ngInject */
 @Named  //test class name
 class ClassA {
     prop: string;
@@ -152,19 +148,19 @@ class ClassA {
 
 //test circular injection
 
-// @ngInject
+/* @ngInject */
 @Named
 class ClassZ {
     constructor(public classX: ClassX) { }
 }
 
-// @ngInject
+/* @ngInject */
 @Named
 class ClassY {
     constructor(public classZ: ClassZ) { }
 }
 
-// @ngInject
+/* @ngInject */
 @Named
 class ClassX {
     constructor(public classY: ClassY) { }
