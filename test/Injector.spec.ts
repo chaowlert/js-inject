@@ -75,6 +75,18 @@ describe('Injector', function () {
         expect(result).equals(15);
     });
 
+    it('should be able to invoke a function (without ngInject)', function () {
+        //assign
+        let injector = Registry.createInjector();
+        let locals = { num: 5 };
+
+        //act
+        let result = injector.invoke((classE: ClassE, num: number) => classE.id + num, null, locals);
+
+        //assert
+        expect(result).equals(15);
+    });
+
     it('should be able to instantiate a class', function () {
         //assign
         let injector = Registry.createInjector();
@@ -148,19 +160,16 @@ class ClassA {
 
 //test circular injection
 
-/* @ngInject */
 @Named
 class ClassZ {
     constructor(public classX: ClassX) { }
 }
 
-/* @ngInject */
 @Named
 class ClassY {
     constructor(public classZ: ClassZ) { }
 }
 
-/* @ngInject */
 @Named
 class ClassX {
     constructor(public classY: ClassY) { }

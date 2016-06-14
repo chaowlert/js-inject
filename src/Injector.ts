@@ -3,6 +3,10 @@ import { Registry } from './Registry';
 
 Registry.setInjectorFactory(() => new Injector());
 
+interface InjectableFunction extends Function {
+    $inject: string[];
+}
+
 export class Injector implements inject.IInject {
 
     private cached: inject.IMap<any> = {};
@@ -20,15 +24,9 @@ export class Injector implements inject.IInject {
         return this._invoke(factory, previous, self, locals);
     }
 
-    private _invoke(factory: Function | any[], previous: Set<string>, self: any, locals: inject.IMap<any>) {
-        let fn: Function;
-        let $inject: string[] = null;
-        if (factory instanceof Array) {
-            fn = factory.pop();
-            $inject = factory;
-        } else {
-            fn = factory;
-        }
+    private _invoke(factory: any, previous: Set<string>, self: any, locals: inject.IMap<any>) {
+        let fn = this._getInjectableFunction(factory);
+        let $inject = fn.$inject;
 
         let args = $inject ? $inject.map(k => this._get(k, previous, locals)) : [];
         return fn.apply(self, args);
@@ -42,7 +40,8 @@ export class Injector implements inject.IInject {
     }
 
     private _instantiate(type: any, previous: Set<string>, locals: inject.IMap<any>) {
-        let $inject: string[] = type.$inject;
+        let fn = this._getInjectableFunction(type);
+        let $inject = fn.$inject;
         let args = $inject ? $inject.map(k => this._get(k, previous, locals)) : [];
         return new type(...args);
     }
@@ -97,5 +96,33 @@ export class Injector implements inject.IInject {
         }
 
         return result;
+    }
+
+    static FN_ARGS = /^function\s*[^\(]*\(\s*([^\)]*)\)/m;
+    static FN_ARG_SPLIT = /,/;
+    static FN_ARG = /^\s*(_?)(.+?)\1\s*$/;
+    static STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
+    private _getInjectableFunction(fn: InjectableFunction | any[]): InjectableFunction {
+        if (fn instanceof Array) {
+            let last: InjectableFunction = fn.pop();
+            last.$inject = fn;
+            return last;
+        } else if (typeof fn === 'function') {
+            let $inject: string[];
+            if (!($inject = fn.$inject)) {
+                $inject = [];
+                let fnText: string = fn.toString().replace(Injector.STRIP_COMMENTS, '');
+                let argDecl = fnText.match(Injector.FN_ARGS);
+                for (let arg of argDecl[1].split(Injector.FN_ARG_SPLIT)) {
+                    arg.replace(Injector.FN_ARG, (str, _, name) => {
+                        $inject.push(name);
+                        return str;
+                    });
+                }
+                fn.$inject = $inject;
+                return fn;
+            }
+        }
+        return <InjectableFunction>fn;
     }
 }
