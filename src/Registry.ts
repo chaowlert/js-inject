@@ -1,3 +1,13 @@
+declare let global: any;
+let g =
+  typeof global === 'object' ? global :
+  typeof window === 'object' ? window :
+  typeof self === 'object' ? self : this;
+
+if (!g._jsInjectGlobal) {
+    g._jsInjectGlobal = {};
+}
+
 export class Registry {
     static naming = {
         camelCase(name: string) {
@@ -7,17 +17,17 @@ export class Registry {
 
     static registerService(name: string, type: Function) {
         let data: inject.IMetadata = { name: name, type: type };
-        Reflect.defineMetadata('inject:' + name, data, Registry);
+        Reflect.defineMetadata('inject:' + name, data, g._jsInjectGlobal);
     }
 
     static registerValue(name: string, value: any) {
         let data: inject.IMetadata = { name: name, value: value };
-        Reflect.defineMetadata('inject:' + name, data, Registry);
+        Reflect.defineMetadata('inject:' + name, data, g._jsInjectGlobal);
     }
 
     static registerFactory(name: string, factory: Function | any[]) {
         let data: inject.IMetadata = { name: name, factory: factory };
-        Reflect.defineMetadata('inject:' + name, data, Registry);
+        Reflect.defineMetadata('inject:' + name, data, g._jsInjectGlobal);
     }
 
     static registerProperty(name: string, type: Function, propertyKey: string) {
@@ -32,11 +42,11 @@ export class Registry {
     }
 
     static getMetadata(name: string): inject.IMetadata {
-        return Reflect.getMetadata('inject:' + name, Registry);
+        return Reflect.getMetadata('inject:' + name, g._jsInjectGlobal);
     }
 
     static getNames(): string[] {
-        return Reflect.getMetadataKeys(Registry)
+        return Reflect.getMetadataKeys(g._jsInjectGlobal)
             .filter(name => name.substr(0, 7) === 'inject:')
             .map(name => name.substr(7));
     }

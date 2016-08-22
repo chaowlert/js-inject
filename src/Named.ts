@@ -6,7 +6,9 @@ export function Named(name: string | Function): any {
             Registry.registerService(name, func);
         };
     } else {
-        let key = Registry.resolveName(name.name);
-        Registry.registerService(key, name);
+        let func = name;
+        let fnName = func.toString().match(/^function\s*([^\s(]+)/)[1];
+        let key = Registry.resolveName(fnName);
+        Registry.registerService(key, func);
     }
 }
