@@ -31,8 +31,8 @@ gulp.task('lint', function () {
         'src/**/*.ts',
         'test/**/*.ts'
     ])
-        .pipe(tslint())
-        .pipe(tslint.report('verbose', { emitError: true }));
+        .pipe(tslint({ formatter: 'verbose' }))
+        .pipe(tslint.report({ emitError: true }));
 });
 
 //******************************************************************************
