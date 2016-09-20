@@ -41,6 +41,7 @@ gulp.task('lint', function () {
 var pkg = require('./package.json');
 
 var tsDistProject = tsc.createProject('tsconfig.json', {
+    target: 'es5',
     declaration: true,
     stripInternal: true,
     typescript: require('typescript')
@@ -110,6 +111,7 @@ gulp.task('listfiles-index', function () {
 });
 
 var tsSrcProject = tsc.createProject('tsconfig.json', {
+    target: 'es5',
     typescript: require('typescript')
 });
 
@@ -126,6 +128,7 @@ gulp.task('build-src', function () {
 });
 
 var tsTestProject = tsc.createProject('tsconfig.json', {
+    target: 'es5',
     removeComments: false,
     typescript: require('typescript')
 });
