@@ -8,19 +8,19 @@
 require('harmonize')();
 
 var gulp = require('gulp'),
-    tslint = require('gulp-tslint'),
-    tsc = require('gulp-typescript'),
-    sourcemaps = require('gulp-sourcemaps'),
-    codecov = require('gulp-codecov'),
-    typedoc = require('gulp-typedoc'),
-    runSequence = require('run-sequence'),
-    mocha = require('gulp-mocha'),
-    istanbul = require('gulp-istanbul'),
-    merge = require('merge2'),
-    babel = require('gulp-babel'),
     clean = require('gulp-clean'),
+    istanbul = require('gulp-istanbul'),
+    istanbulReport = require('gulp-istanbul-report'),
     listfiles = require('gulp-listfiles'),
-    ngAnnotate = require('gulp-ng-annotate');
+    mocha = require('gulp-mocha'),
+    ngAnnotate = require('gulp-ng-annotate'),
+    sourcemaps = require('gulp-sourcemaps'),
+    tslint = require('gulp-tslint'),
+    typedoc = require('gulp-typedoc'),
+    tsc = require('gulp-typescript'),
+    merge = require('merge2'),
+    remapIstanbul = require('remap-istanbul/lib/gulpRemapIstanbul'),
+    runSequence = require('run-sequence');
 
 //******************************************************************************
 //* LINT
@@ -40,7 +40,11 @@ gulp.task('lint', function () {
 //******************************************************************************
 var pkg = require('./package.json');
 
-var tsDistProject = tsc.createProject('tsconfig.json', { declaration: true, stripInternal: true });
+var tsDistProject = tsc.createProject('tsconfig.json', {
+    declaration: true,
+    stripInternal: true,
+    typescript: require('typescript')
+});
 
 gulp.task('build-dist', function () {
     var tsResult = gulp.src('src/**/*.ts')
@@ -49,8 +53,7 @@ gulp.task('build-dist', function () {
             process.exit(1);
         });
     return merge([
-        tsResult.js.pipe(babel({ presets: ['es2015-loose', 'stage-3'] }))
-            .pipe(gulp.dest('dist/')),
+        tsResult.js.pipe(gulp.dest('dist/')),
         tsResult.dts.pipe(gulp.dest('dist/')),
     ]);
 });
@@ -106,7 +109,9 @@ gulp.task('listfiles-index', function () {
         .pipe(gulp.dest('src/'));
 });
 
-var tsSrcProject = tsc.createProject('tsconfig.json');
+var tsSrcProject = tsc.createProject('tsconfig.json', {
+    typescript: require('typescript')
+});
 
 gulp.task('build-src', function () {
     return gulp.src(['src/**/*.ts'], { base: './' })
@@ -116,11 +121,14 @@ gulp.task('build-src', function () {
             process.exit(1);
         })
         .js
-        .pipe(sourcemaps.write('./'))
+        .pipe(sourcemaps.write('./', {sourceRoot: './'}))
         .pipe(gulp.dest('build/'));
 });
 
-var tsTestProject = tsc.createProject('tsconfig.json', { removeComments: false });
+var tsTestProject = tsc.createProject('tsconfig.json', {
+    removeComments: false,
+    typescript: require('typescript')
+});
 
 gulp.task('build-test', function () {
     return gulp.src(['test/**/*.ts'], { base: './' })
@@ -130,7 +138,6 @@ gulp.task('build-test', function () {
             process.exit(1);
         })
         .js
-        .pipe(babel({ presets: ['es2015-loose', 'stage-3'] }))
         .pipe(ngAnnotate({ add: true, remove: true, singleQuotes: true }))
         .pipe(sourcemaps.write('./'))
         .pipe(gulp.dest('build/'));
@@ -147,7 +154,9 @@ gulp.task('mocha', function () {
         'build/test/**/*.js'
     ])
         .pipe(mocha({ ui: 'bdd' }))
-        .pipe(istanbul.writeReports());
+        .pipe(istanbul.writeReports({
+            reporters: ['json']
+        }));
 });
 
 gulp.task('istanbul:hook', function () {
@@ -161,14 +170,17 @@ gulp.task('istanbul:hook', function () {
         .pipe(istanbul.hookRequire());
 });
 
-gulp.task('cover', function () {
-    if (!process.env.CI) return;
-    return gulp.src('coverage/**/lcov.info')
-        .pipe(codecov());
+gulp.task('remap-istanbul', function () {
+    return gulp.src('coverage/coverage-final.json')
+        .pipe(remapIstanbul())
+        .pipe(istanbulReport({
+            dir: './coverage',
+            reporters: ['lcov', 'json', 'text', 'text-summary']
+        }));
 });
 
 gulp.task('test', function (cb) {
-    runSequence('istanbul:hook', 'mocha', 'cover', cb);
+    runSequence('istanbul:hook', 'mocha', 'remap-istanbul', cb);
 });
 
 gulp.task('build', function (cb) {
