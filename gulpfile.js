@@ -80,11 +80,11 @@ gulp.task('listfiles-model', function () {
         'src/models/**.ts'
     ], { read: false })
         .pipe(listfiles({
-            filename: '_models.ts',
+            filename: 'index.ts',
             prefix: 'import \'./',
             postfix: '\';',
             replacements: [{
-                pattern: /\.[^/.]+$/,
+                pattern: /\.ts$/,
                 replacement: ''
             }]
         }))
@@ -101,9 +101,9 @@ gulp.task('listfiles-index', function () {
             filename: 'index.ts',
             prefix: 'export * from \'./',
             postfix: '\';',
-            banner: 'import \'./models/_models\';',
+            banner: 'import \'./models\';',
             replacements: [{
-                pattern: /\.[^/.]+$/,
+                pattern: /\.ts$/,
                 replacement: ''
             }]
         }))
@@ -166,7 +166,7 @@ gulp.task('istanbul:hook', function () {
     return gulp.src([
         'build/src/**/*.js',
         '!build/src/index.js',
-        '!build/src/models/_models.js'])
+        '!build/src/models/**.js'])
         // Covering files
         .pipe(istanbul())
         // Force `require` to return covered files

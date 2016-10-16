@@ -1,4 +1,4 @@
-import './models/_models';
+import './models';
 export * from './Inject';
 export * from './Injector';
 export * from './Named';
