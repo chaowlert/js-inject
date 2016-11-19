@@ -1,7 +1,7 @@
 {
   "name": "js-inject",
   "description": "Simple dependency injection for javascript",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Chaowlert Chaisrichalermpol",
   "license": "MIT",
   "files": [
@@ -16,8 +16,9 @@
     "url": "git://github.com/chaowlert/js-inject.git"
   },
   "keywords": [
-    "js",
-    "inject"
+    "angular",
+    "dependency",
+    "injection"
   ],
   "bugs": {
     "url": "https://github.com/chaowlert/js-inject/issues"

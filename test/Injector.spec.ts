@@ -92,7 +92,7 @@ describe('Injector', function () {
         let injector = Registry.createInjector();
 
         //act
-        let classB = injector.instantiate<ClassB>(ClassB);
+        let classB = injector.instantiate(ClassB);
 
         //assert
         expect(classB.classC).instanceOf(ClassC);
