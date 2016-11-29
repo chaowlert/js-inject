@@ -1,7 +1,9 @@
 /// <reference path="../typings/index.d.ts" />
 
-import {Named, Inject, PostConstruct, Registry, Injector} from '../src/index';
+import {Inject, Injector, Named, PostConstruct, Registry} from '../src/index';
+
 import {expect} from 'chai';
+import { getNameIE } from '../src/Named';
 
 describe('Injector', function () {
     it('should be able to inject', function () {
@@ -116,6 +118,14 @@ describe('Registry', function () {
             .and.include('classX')
             .and.include('classY')
             .and.include('classZ');
+    });
+});
+
+describe('Named', function () {
+    it('should be able to get function name', function () {
+        let result = getNameIE(ClassE);
+
+        expect(result).equals('ClassE');
     });
 });
 
