@@ -51,7 +51,7 @@ export class Registry {
             .map(name => name.substr(7));
     }
 
-    static getPropertyMetaData(type: Function): inject.IMap<inject.IPropertyMetadata> {
+    static getPropertyMetaData(type: Function): Record<string, inject.IPropertyMetadata> {
         return Reflect.getMetadata('inject:properties', type);
     }
 

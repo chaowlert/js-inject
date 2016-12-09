@@ -9,7 +9,7 @@ interface InjectableFunction extends Function {
 
 export class Injector implements inject.IInject {
 
-    private cached: inject.IMap<any> = {};
+    private cached: Record<string, any> = {};
 
     get<T>(name: string): T {
         return this._get(name, new Set<string>());
@@ -19,12 +19,12 @@ export class Injector implements inject.IInject {
         return !!this.cached[name] || !!Registry.getMetadata(name);
     }
 
-    invoke<T>(factory: Function | any[], self?: any, locals?: inject.IMap<any>) {
+    invoke(factory: Function | any[], self?: any, locals?: Record<string, any>) {
         let previous = new Set<string>();
         return this._invoke(factory, previous, self, locals);
     }
 
-    private _invoke(factory: any, previous: Set<string>, self: any, locals: inject.IMap<any>) {
+    private _invoke(factory: any, previous: Set<string>, self: any, locals: Record<string, any>) {
         let fn = this._getInjectableFunction(factory);
         let $inject = fn.$inject;
 
@@ -32,21 +32,21 @@ export class Injector implements inject.IInject {
         return fn.apply(self, args);
     }
 
-    instantiate<T>(type: Function, locals?: inject.IMap<any>) {
+    instantiate(type: Function, locals?: Record<string, any>) {
         let previous = new Set<string>();
         let result = this._instantiate(type, previous, locals);
         this._injectProperties(result, type, previous, locals);
         return result;
     }
 
-    private _instantiate(type: any, previous: Set<string>, locals: inject.IMap<any>) {
+    private _instantiate(type: any, previous: Set<string>, locals: Record<string, any>) {
         let fn = this._getInjectableFunction(type);
         let $inject = fn.$inject;
         let args = $inject ? $inject.map(k => this._get(k, previous, locals)) : [];
         return new type(...args);
     }
 
-    private _injectProperties(result: any, type: any, previous: Set<string>, locals: inject.IMap<any>) {
+    private _injectProperties(result: any, type: any, previous: Set<string>, locals: Record<string, any>) {
         let props = Registry.getPropertyMetaData(type) || {};
         let keys = Object.keys(props);
         for (let prop of keys) {
@@ -60,7 +60,7 @@ export class Injector implements inject.IInject {
         }
     }
 
-    private _get(name: string, previous: Set<string>, locals?: inject.IMap<any>): any {
+    private _get(name: string, previous: Set<string>, locals?: Record<string, any>): any {
         //get from cache
         let result = this.cached[name];
         if (result) {
