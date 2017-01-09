@@ -1,7 +1,7 @@
 {
   "name": "js-inject",
-  "description": "Simple dependency injection for javascript",
-  "version": "0.3.0",
+  "description": "Angular liked dependency injection as a module",
+  "version": "0.3.1",
   "author": "Chaowlert Chaisrichalermpol",
   "license": "MIT",
   "files": [
@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "gulp",
-    "prepublish": "typings install & gulp prepublish"
+    "prepublish": "gulp prepublish"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,9 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "devDependencies": {
+    "@types/chai": "^3.4.34",
+    "@types/mocha": "^2.2.36",
+    "@types/sinon": "^1.16.34",
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
     "gulp-clean": "^0.3.2",

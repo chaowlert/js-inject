@@ -1,4 +1,4 @@
-import './models';
+import './models/index';
 export * from './Inject';
 export * from './Injector';
 export * from './Named';

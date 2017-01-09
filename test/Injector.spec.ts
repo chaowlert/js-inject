@@ -1,5 +1,3 @@
-/// <reference path="../typings/index.d.ts" />
-
 import {Inject, Injector, Named, PostConstruct, Registry} from '../src/index';
 
 import {expect} from 'chai';

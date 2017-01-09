@@ -92,7 +92,7 @@ gulp.task('listfiles-index', function () {
             filename: 'index.ts',
             prefix: 'export * from \'./',
             postfix: '\';',
-            banner: 'import \'./models\';',
+            banner: 'import \'./models/index\';',
             replacements: [{
                 pattern: /\.ts$/,
                 replacement: ''
