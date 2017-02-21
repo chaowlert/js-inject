@@ -1,7 +1,7 @@
 {
   "name": "js-inject",
   "description": "Angular liked dependency injection as a module",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "Chaowlert Chaisrichalermpol",
   "license": "MIT",
   "files": [

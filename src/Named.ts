@@ -1,12 +1,9 @@
 import { Registry } from './Registry';
 
-class Base { }
-class Derive extends Base { }
-
 let getName = (func: Function) => func.name;
 /** @internal */
 export let getNameIE = (func: Function) => func.toString().match(/^(?:function|class)\s+([^\s(]+)/)[1];
-if (getName(Derive) !== 'Derive') {
+if (isIE()) {
     getName = getNameIE;
 }
 
@@ -21,4 +18,18 @@ export function Named(name: string | Function): any {
         let key = Registry.resolveName(fnName);
         Registry.registerService(key, func);
     }
+}
+
+function isIE(): boolean {
+    if (typeof navigator === 'undefined') {
+        return false;
+    }
+    if (navigator.appName === 'Microsoft Internet Explorer') {
+        return true;
+    }    
+    if (navigator.appName === 'Netscape') {
+        return navigator.appVersion.indexOf('Trident') > -1
+            || navigator.appVersion.indexOf('Edge') > -1;
+    }
+    return false;
 }
